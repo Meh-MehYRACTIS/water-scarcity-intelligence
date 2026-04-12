@@ -742,23 +742,22 @@
     <p class="prose">The technology gap in Iran is not primarily technical — it is geopolitical and institutional. Most solutions that could meaningfully reduce Iran's water crisis exist as proven technology. The barriers are sanctions limiting equipment access, political economy problems within the agricultural sector, and a government under too much economic pressure to invest in long-term infrastructure. This is the pattern that distinguishes Iran from comparable arid regions that have achieved water stability: the problem is not unsolvable, but the conditions for solutions are actively constrained.</p>
   </section>
 
-  <!-- LAYER 4: AI INTELLIGENCE BRIEF -->
+  <!-- LAYER 4: INTELLIGENCE BRIEF -->
   <section class="layer">
-    <div class="layer-label">Layer 4 — AI Intelligence Brief</div>
+    <div class="layer-label">Layer 4 — Intelligence Brief</div>
     <h2>Systems Analysis</h2>
 
     <div class="ai-brief">
       <div class="ai-brief-header">
-        <span class="ai-brief-label">Generated Intelligence Brief</span>
-        <span class="ai-brief-model">claude-sonnet-4 · water-scarcity-framework v1.0</span>
+        <span class="ai-brief-label">Intelligence Assessment · Iran Water Crisis</span>
+        <span class="ai-brief-model">Water Scarcity Intelligence Project · Framework v1.0</span>
       </div>
-      <div class="ai-brief-body" id="brief-output">
-        <p id="brief-text">Click "Generate Intelligence Brief" to produce an AI-synthesized analysis connecting the data above into actionable intelligence.</p>
+      <div class="ai-brief-body">
+        <p>Iran's water crisis is no longer a resource management problem. It is a systems failure — one in which the feedback loops between depletion, agricultural collapse, economic deterioration, and political instability have become self-reinforcing. The country's aquifers are being drawn down at two to four times their natural recharge rate across its most productive agricultural provinces. Lake Urmia, once the sixth-largest saltwater lake in the world, has lost roughly 70% of its surface area since 1970 and now sits at approximately 8% of its historical baseline. These are not projections. They are measurements from satellite data and ground monitoring collected over decades. The physical reality is locked in.</p>
+        <p>The economic consequences follow a predictable cascade. Agriculture accounts for 92% of Iran's water consumption and roughly 12% of GDP, employing nearly one in five workers. As water availability contracts, crop yields fall, marginal farmland is abandoned, and rural unemployment concentrates in the provinces already bearing the heaviest water stress — Isfahan, Yazd, Kerman, Khorasan. Food import dependency increases precisely as sanctions constrain the foreign exchange needed to finance those imports. The Bank for International Settlements projects GDP reductions of 6–8% in agricultural economies under severe water stress; Iran's combination of water crisis and sanctions creates compounding drag that exceeds what either pressure would produce alone. Food price inflation exceeding 40% between 2018 and 2023 is the visible symptom of this compound dynamic. The 2021 Khuzestan water protests — which turned fatal — are the political expression of it.</p>
+        <p>The technology gap is real but secondary. Drip irrigation could reduce agricultural water demand by 30–50% with no yield loss; Iran's adoption rate remains below 10% of irrigated land. Desalination at scale is technically feasible given 2,440 kilometers of Persian Gulf and Oman Sea coastline and domestic natural gas resources — but sanctions block access to the advanced membrane components the technology requires. Governance reform of water rights, which has reversed comparable trajectories in Chile and Australia, faces entrenched political resistance from agricultural constituencies. The honest assessment: the tools to change Iran's water trajectory exist. The conditions under which those tools could be deployed do not. That gap — between technical possibility and political achievability — is where the crisis will be resolved or not. For investors assessing regional exposure, for policymakers designing sanctions frameworks, and for researchers modeling food system risk, Iran is not a cautionary tale about the future. It is a live case study of what water bankruptcy looks like when it is already underway.</p>
       </div>
-      <button class="generate-btn" id="gen-btn" onclick="generateBrief()">Generate Intelligence Brief →</button>
     </div>
-
-    <p class="prose">The intelligence brief above synthesizes the four data layers into a plain-language assessment for decision-makers: investors, policymakers, journalists, and researchers who need to understand not just what is happening, but what it means and what comes next.</p>
   </section>
 
   <!-- LAYER 5: TRAJECTORY & IMPLICATIONS -->
@@ -796,68 +795,7 @@
   <p style="margin-top:0.5rem;"><a href="#">Methodology</a> · <a href="#">About This Project</a> · <a href="#">Subscribe</a></p>
 </footer>
 
-<script>
-async function generateBrief() {
-  const btn = document.getElementById('gen-btn');
-  const output = document.getElementById('brief-output');
-  const text = document.getElementById('brief-text');
 
-  btn.disabled = true;
-  btn.textContent = 'Generating analysis...';
-  output.style.display = 'block';
-  text.textContent = '';
-
-  const systemPrompt = `You are an intelligence analyst for the Water Scarcity Intelligence Project — a research initiative that synthesizes global water data into systems-level narratives connecting scarcity to economic, agricultural, and human consequences.
-
-Your analytical framework: Water Scarcity → Agricultural Impact → Economic Cascade → Human/Geopolitical Consequences → Technology Solutions Assessment → Comparative Implications.
-
-Write in the voice of a serious, non-sensationalist intelligence brief. No bullet points. Flowing paragraphs. Cite specific data where relevant. Connect dots the reader cannot connect alone. End with the "so what" for investors, policymakers, or researchers.`;
-
-  const userPrompt = `Generate a 3-paragraph intelligence brief on Iran's water crisis using this framework data:
-
-SCARCITY: 97% of Iran under high water stress (WRI Aqueduct). Lake Urmia has lost ~70% of surface area since 1970, now at ~8% of baseline. Average groundwater depletion 1.2m/year in critical agricultural provinces. Per capita water availability below 1,700 m³/year threshold.
-
-ECONOMIC CASCADE: Agricultural sector is 92% of water use, 12% of GDP, 18% of workforce. 2017–2018 drought caused 25% provincial agricultural output decline. Food price inflation exceeded 40% 2018–2023. Sanctions compound import dependency. BIS research projects 6–8% GDP impact from severe water stress in agricultural economies.
-
-TECHNOLOGY BARRIERS: Drip irrigation adoption under 10% of irrigated land. Desalination technically feasible (2,440km coastline) but sanctions block advanced membrane procurement. Governance barriers: water rights reform faces political resistance from agricultural sector.
-
-Write the brief now. 3 paragraphs. Intelligence analyst voice. No headers.`;
-
-  try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        system: systemPrompt,
-        messages: [{ role: 'user', content: userPrompt }]
-      })
-    });
-
-    const data = await response.json();
-
-    if (data.content && data.content[0] && data.content[0].text) {
-      const paragraphs = data.content[0].text.split('\n\n').filter(p => p.trim());
-      text.innerHTML = '';
-      paragraphs.forEach(para => {
-        const p = document.createElement('p');
-        p.textContent = para.trim();
-        text.parentNode.insertBefore(p, text);
-      });
-      text.remove();
-      btn.textContent = 'Regenerate →';
-      btn.disabled = false;
-    } else {
-      throw new Error('Unexpected response format');
-    }
-  } catch (err) {
-    text.textContent = 'API call failed. To enable this feature: add your Anthropic API key to this file (search for the fetch call and add an Authorization header). The rest of the tool works without it.';
-    btn.textContent = 'Retry →';
-    btn.disabled = false;
-  }
-}
-</script>
 
 </body>
 </html>
