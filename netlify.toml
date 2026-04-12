@@ -1,0 +1,34 @@
+# ============================================================
+# Water Scarcity Intelligence Project
+# Netlify Configuration
+# ============================================================
+
+[build]
+  # No build step needed — pure static files
+  publish = "."
+
+# Security headers for all pages
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options          = "DENY"
+    X-Content-Type-Options   = "nosniff"
+    Referrer-Policy          = "strict-origin-when-cross-origin"
+    Permissions-Policy       = "geolocation=(), camera=(), microphone=()"
+
+# Cache JS and CSS for 1 day (short enough to pick up updates quickly)
+[[headers]]
+  for = "/*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+[[headers]]
+  for = "/*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=86400"
+
+# SPA fallback: any unknown path serves index.html
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200
