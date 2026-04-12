@@ -36,6 +36,7 @@
     elLoading.hidden  = true;
     elError.hidden    = false;
     elApp.hidden      = true;
+    console.error('[WSIP Error]', msg);
   }
 
   function showApp() {

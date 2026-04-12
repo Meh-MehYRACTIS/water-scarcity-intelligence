@@ -116,10 +116,12 @@ body {
 
 .error-body {
   font-family: var(--sans);
-  font-size: 14px;
-  color: var(--text-muted);
+  font-size: 15px;
+  color: var(--amber);
   max-width: 520px;
   line-height: 1.6;
+  text-align: center;
+  font-weight: 600;
 }
 
 /* ============================================================
