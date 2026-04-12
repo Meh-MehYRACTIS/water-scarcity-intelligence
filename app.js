@@ -74,19 +74,28 @@
   // ----------------------------------------------------------
 
   async function apiFetch(path) {
-    const url      = `${SUPABASE_URL}/rest/v1/${path}`;
-    const response = await fetch(url, {
-      headers: {
-        'apikey':        SUPABASE_ANON_KEY,
-        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-        'Accept':        'application/json'
+    const url        = `${SUPABASE_URL}/rest/v1/${path}`;
+    const controller = new AbortController();
+    const timer      = setTimeout(() => controller.abort(), 12000);
+    try {
+      const response = await fetch(url, {
+        signal: controller.signal,
+        headers: {
+          'apikey':        SUPABASE_ANON_KEY,
+          'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+          'Accept':        'application/json'
+        }
+      });
+      clearTimeout(timer);
+      if (!response.ok) {
+        const body = await response.text().catch(() => '');
+        throw new Error(`API ${response.status}: ${body || response.statusText}`);
       }
-    });
-    if (!response.ok) {
-      const body = await response.text().catch(() => '');
-      throw new Error(`API ${response.status}: ${body || response.statusText}`);
+      return response.json();
+    } catch (err) {
+      clearTimeout(timer);
+      throw err;
     }
-    return response.json();
   }
 
   async function fetchCountries() {
