@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Iran Water Crisis — Water Scarcity Intelligence</title>
+<style>
+  :root {
+    --bg: #0a0f0d;
+    --surface: #111714;
+    --surface2: #161d19;
+    --border: rgba(255,255,255,0.08);
+    --border-em: rgba(255,255,255,0.15);
+    --text: #e8ede9;
+    --text-muted: #7a9080;
+    --text-dim: #4a5e50;
+    --accent: #1d9e75;
+    --accent-dim: #0f6e56;
+    --accent-pale: rgba(29,158,117,0.12);
+    --danger: #e24b4a;
+    --danger-pale: rgba(226,75,74,0.1);
+    --amber: #ef9f27;
+    --amber-pale: rgba(239,159,39,0.1);
+    --blue: #378add;
+    --blue-pale: rgba(55,138,221,0.1);
+    --font: 'Georgia', 'Times New Roman', serif;
+    --font-sans: 'Helvetica Neue', Arial, sans-serif;
+    --font-mono: 'Courier New', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font);
+    font-size: 17px;
+    line-height: 1.75;
+    min-height: 100vh;
+  }
+
+  /* HEADER */
+  .site-header {
+    border-bottom: 1px solid var(--border);
+    padding: 1rem 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+  }
+  .site-logo {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .site-nav {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+  }
+  .site-nav a {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+  .site-nav a:hover { color: var(--text); }
+
+  /* HERO */
+  .hero {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 5rem 2rem 3rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .geography-tag {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+  }
+  .hero h1 {
+    font-family: var(--font);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: normal;
+    line-height: 1.15;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.02em;
+  }
+  .hero-deck {
+    font-size: 1.15rem;
+    color: var(--text-muted);
+    max-width: 680px;
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+    font-family: var(--font-sans);
+  }
+  .hero-meta {
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .meta-item {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+  }
+  .meta-item span { color: var(--text-muted); }
+
+  /* RISK SCORE */
+  .risk-banner {
+    background: var(--danger-pale);
+    border: 1px solid var(--danger);
+    border-radius: 4px;
+    padding: 1.5rem 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .risk-label {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--danger);
+    margin-bottom: 0.25rem;
+  }
+  .risk-rating {
+    font-family: var(--font-mono);
+    font-size: 2.5rem;
+    color: var(--danger);
+    line-height: 1;
+  }
+  .risk-name {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 0.25rem;
+  }
+  .risk-desc {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--text-muted);
+    max-width: 480px;
+    line-height: 1.5;
+  }
+
+  /* MAIN LAYOUT */
+  .main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 2rem;
+  }
+
+  /* LAYER SECTIONS */
+  .layer {
+    padding: 3rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .layer-label {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+  .layer h2 {
+    font-family: var(--font);
+    font-size: 1.75rem;
+    font-weight: normal;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.01em;
+  }
+
+  /* DATA STATS */
+  .stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+  .stat {
+    background: var(--surface);
+    padding: 1.25rem 1.5rem;
+  }
+  .stat-value {
+    font-family: var(--font-mono);
+    font-size: 1.75rem;
+    color: var(--text);
+    line-height: 1;
+    margin-bottom: 0.4rem;
+  }
+  .stat-value.danger { color: var(--danger); }
+  .stat-value.amber { color: var(--amber); }
+  .stat-value.muted { color: var(--text-muted); }
+  .stat-label {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  /* VISUAL: LAKE URMIA DECLINE */
+  .lake-visual {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .lake-header {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .lake-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .lake-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .lake-year {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    width: 40px;
+    flex-shrink: 0;
+  }
+  .lake-bar-wrap {
+    flex: 1;
+    height: 20px;
+    background: var(--surface2);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .lake-bar {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s;
+  }
+  .lake-pct {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
+    width: 40px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  /* CASCADE FLOW */
+  .cascade {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin-bottom: 2rem;
+  }
+  .cascade-node {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+  .cascade-node:last-child { border-bottom: none; }
+  .cascade-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: bold;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .cascade-icon.water { background: var(--blue-pale); color: var(--blue); border: 1px solid var(--blue); }
+  .cascade-icon.ag { background: var(--accent-pale); color: var(--accent); border: 1px solid var(--accent); }
+  .cascade-icon.econ { background: var(--amber-pale); color: var(--amber); border: 1px solid var(--amber); }
+  .cascade-icon.social { background: var(--danger-pale); color: var(--danger); border: 1px solid var(--danger); }
+  .cascade-body h3 {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.35rem;
+    letter-spacing: 0.02em;
+  }
+  .cascade-body p {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 0.5rem;
+  }
+  .cascade-stat {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 2px 8px;
+    border-radius: 2px;
+  }
+  .cascade-stat.blue { background: var(--blue-pale); color: var(--blue); }
+  .cascade-stat.green { background: var(--accent-pale); color: var(--accent); }
+  .cascade-stat.amber { background: var(--amber-pale); color: var(--amber); }
+  .cascade-stat.red { background: var(--danger-pale); color: var(--danger); }
+
+  /* PROSE */
+  .prose {
+    font-size: 17px;
+    line-height: 1.75;
+    color: var(--text);
+    margin-bottom: 1.5rem;
+  }
+  .prose strong {
+    color: var(--text);
+    font-weight: normal;
+    border-bottom: 1px solid var(--text-dim);
+  }
+
+  /* TECH SOLUTIONS */
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+  .tech-card {
+    background: var(--surface);
+    padding: 1.5rem;
+  }
+  .tech-tag {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 2px;
+  }
+  .tech-tag.supply { background: var(--blue-pale); color: var(--blue); }
+  .tech-tag.efficiency { background: var(--accent-pale); color: var(--accent); }
+  .tech-tag.governance { background: var(--amber-pale); color: var(--amber); }
+  .tech-card h3 {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+  }
+  .tech-card p {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-bottom: 0.75rem;
+  }
+  .tech-barrier {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    color: var(--text-dim);
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border);
+  }
+  .tech-barrier strong {
+    color: var(--danger);
+    font-weight: normal;
+  }
+
+  /* AI INTELLIGENCE BRIEF */
+  .ai-brief {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 2rem;
+  }
+  .ai-brief-header {
+    background: var(--surface2);
+    padding: 0.75rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+  .ai-brief-label {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .ai-brief-model {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+  }
+  .ai-brief-body {
+    padding: 1.5rem;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+  .ai-brief-body p { margin-bottom: 1rem; }
+  .ai-brief-body p:last-child { margin-bottom: 0; }
+  .generate-btn {
+    display: block;
+    width: 100%;
+    background: transparent;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    padding: 0.85rem;
+    font-family: var(--font-sans);
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    cursor: pointer;
+    transition: background 0.2s;
+    text-align: center;
+  }
+  .generate-btn:hover { background: var(--accent-pale); }
+  .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  #brief-output { display: none; }
+
+  /* SOURCE CITATIONS */
+  .sources {
+    padding: 2rem 0;
+    border-top: 1px solid var(--border);
+  }
+  .sources h3 {
+    font-family: var(--font-sans);
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+  }
+  .source-list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 0.5rem;
+  }
+  .source-list li {
+    font-family: var(--font-sans);
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+  .source-list a {
+    color: var(--text-dim);
+    text-decoration: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .source-list a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  .source-list .dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  /* FOOTER */
+  .site-footer {
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+    text-align: center;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    color: var(--text-dim);
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .site-footer a { color: var(--text-dim); text-decoration: none; }
+  .site-footer a:hover { color: var(--accent); }
+
+  /* COMPARATIVE CALLOUT */
+  .compare-box {
+    background: var(--surface);
+    border-left: 2px solid var(--accent);
+    padding: 1.25rem 1.5rem;
+    margin: 1.5rem 0;
+    border-radius: 0 4px 4px 0;
+  }
+  .compare-box-label {
+    font-family: var(--font-sans);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+  .compare-box p {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  @media (max-width: 600px) {
+    .hero { padding: 3rem 1.25rem 2rem; }
+    .main { padding: 0 1.25rem; }
+    .site-nav { display: none; }
+    .risk-banner { padding: 1rem 1.25rem; }
+    .hero h1 { font-size: 2rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <a class="site-logo" href="#">Water Scarcity Intelligence Project</a>
+  <nav>
+    <ul class="site-nav">
+      <li><a href="#">Intelligence Feed</a></li>
+      <li><a href="#">Risk Index</a></li>
+      <li><a href="#">Methodology</a></li>
+      <li><a href="#">About</a></li>
+    </ul>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="geography-tag">Case Study · Islamic Republic of Iran · Middle East</div>
+  <h1>The Country Running Out of Water in Real Time</h1>
+  <p class="hero-deck">Iran has lost more than 70% of its surface water. Aquifers are collapsing. Agriculture is failing. This is not a future risk — it is an ongoing cascade connecting water depletion to economic breakdown, food insecurity, and social instability.</p>
+  <div class="hero-meta">
+    <div class="meta-item">Published <span>April 2026</span></div>
+    <div class="meta-item">Framework Version <span>1.0</span></div>
+    <div class="meta-item">Data Sources <span>FAO · NASA GRACE · WRI Aqueduct · BIS</span></div>
+  </div>
+</section>
+
+<!-- RISK SCORE BANNER -->
+<div style="max-width:900px;margin:0 auto;padding:2rem 2rem 0;">
+  <div class="risk-banner">
+    <div>
+      <div class="risk-label">Water Bankruptcy Risk Score</div>
+      <div class="risk-rating">CCC–</div>
+      <div class="risk-name">Outlook: Critical / Deteriorating</div>
+    </div>
+    <div class="risk-desc">Iran is in active water bankruptcy. Current depletion rates are irreversible without structural intervention. Economic cascade is already underway. Score reflects composite analysis of surface water, groundwater, agricultural exposure, and economic vulnerability.</div>
+  </div>
+</div>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+  <!-- LAYER 1: SCARCITY STATUS -->
+  <section class="layer">
+    <div class="layer-label">Layer 1 — Scarcity Status</div>
+    <h2>The Water Reality</h2>
+
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="stat-value danger">−70%</div>
+        <div class="stat-label">Lake Urmia surface area lost since 1970</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value danger">97%</div>
+        <div class="stat-label">of land under high or very high water stress (WRI)</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value amber">−1.2m</div>
+        <div class="stat-label">avg annual groundwater decline, critical provinces</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value muted">1,700m³</div>
+        <div class="stat-label">per capita renewable water (below 1,700 = water stress)</div>
+      </div>
+    </div>
+
+    <!-- LAKE URMIA VISUAL -->
+    <div class="lake-visual">
+      <div class="lake-header">Lake Urmia surface area — % of 1970 baseline</div>
+      <div class="lake-bars">
+        <div class="lake-row">
+          <div class="lake-year">1970</div>
+          <div class="lake-bar-wrap"><div class="lake-bar" style="width:100%;background:var(--blue);opacity:0.8;"></div></div>
+          <div class="lake-pct">100%</div>
+        </div>
+        <div class="lake-row">
+          <div class="lake-year">1985</div>
+          <div class="lake-bar-wrap"><div class="lake-bar" style="width:88%;background:var(--blue);opacity:0.7;"></div></div>
+          <div class="lake-pct">88%</div>
+        </div>
+        <div class="lake-row">
+          <div class="lake-year">1998</div>
+          <div class="lake-bar-wrap"><div class="lake-bar" style="width:72%;background:var(--amber);opacity:0.8;"></div></div>
+          <div class="lake-pct">72%</div>
+        </div>
+        <div class="lake-row">
+          <div class="lake-year">2008</div>
+          <div class="lake-bar-wrap"><div class="lake-bar" style="width:45%;background:var(--amber);opacity:0.9;"></div></div>
+          <div class="lake-pct">45%</div>
+        </div>
+        <div class="lake-row">
+          <div class="lake-year">2015</div>
+          <div class="lake-bar-wrap"><div class="lake-bar" style="width:18%;background:var(--danger);opacity:0.9;"></div></div>
+          <div class="lake-pct">18%</div>
+        </div>
+        <div class="lake-row">
+          <div class="lake-year">2024</div>
+          <div class="lake-bar-wrap"><div class="lake-bar" style="width:8%;background:var(--danger);"></div></div>
+          <div class="lake-pct">~8%</div>
+        </div>
+      </div>
+    </div>
+
+    <p class="prose">Iran sits in an arid to semi-arid climate zone with naturally limited freshwater resources. The country receives less than one-third of global average annual precipitation. What made Iran's agriculture viable for millennia — the ancient qanat irrigation systems and snowmelt-fed rivers — is now failing faster than any adaptation strategy can respond. The cause is not drought alone. It is the systematic over-extraction of groundwater, combined with climate shifts, Soviet-era dam construction diverting inflows, and agricultural policies that incentivized water-intensive crops in water-scarce regions.</p>
+
+  </section>
+
+  <!-- LAYER 2: ECONOMIC CASCADE -->
+  <section class="layer">
+    <div class="layer-label">Layer 2 — Economic Cascade</div>
+    <h2>What Water Failure Actually Costs</h2>
+
+    <div class="cascade">
+      <div class="cascade-node">
+        <div class="cascade-icon water">W</div>
+        <div class="cascade-body">
+          <h3>Aquifer depletion accelerates beyond natural recharge</h3>
+          <p>Iran's major agricultural provinces — Isfahan, Yazd, Kerman, Khorasan — are drawing groundwater at 2–4x the natural recharge rate. When aquifers collapse, they do not refill. The land itself subsides.</p>
+          <span class="cascade-stat blue">1.2m/year average depletion rate</span>
+        </div>
+      </div>
+      <div class="cascade-node">
+        <div class="cascade-icon ag">A</div>
+        <div class="cascade-body">
+          <h3>Agricultural output collapses in water-dependent provinces</h3>
+          <p>Iran's agricultural sector employs roughly 18% of the workforce and contributes 12% of GDP. As water disappears, crop yields decline, farms are abandoned, and rural unemployment spikes. The 2017–2018 drought triggered a 25% drop in agricultural output in affected provinces.</p>
+          <span class="cascade-stat green">92% of water use is agricultural</span>
+        </div>
+      </div>
+      <div class="cascade-node">
+        <div class="cascade-icon econ">E</div>
+        <div class="cascade-body">
+          <h3>Food prices inflate; rural-to-urban migration accelerates</h3>
+          <p>As domestic agricultural output falls, Iran becomes more dependent on food imports at a time when sanctions constrain foreign exchange access. The BIS research framework projects that severe water stress can reduce GDP by 6–8% in agricultural-dependent economies. Iran's inflation rate — already elevated by sanctions — is compounded by food price instability.</p>
+          <span class="cascade-stat amber">40%+ food price inflation, 2018–2023</span>
+        </div>
+      </div>
+      <div class="cascade-node">
+        <div class="cascade-icon social">S</div>
+        <div class="cascade-body">
+          <h3>Social instability, migration, and geopolitical pressure</h3>
+          <p>Water-driven agricultural collapse has displaced millions of rural Iranians toward Tehran and other major cities — cities that are themselves under water stress. The 2018 Khuzestan water protests and 2021 Khuzestan water crisis protests resulted in deaths. Water insecurity is now a documented driver of domestic political instability.</p>
+          <span class="cascade-stat red">2M+ estimated water-related displaced persons</span>
+        </div>
+      </div>
+    </div>
+
+    <p class="prose">The Bank for International Settlements (Working Paper No. 1314) quantifies what Iran demonstrates qualitatively: water scarcity creates measurable, predictable GDP contraction, inflation pressure, and investment suppression. These are not soft variables. They are balance sheet consequences that compound over time.</p>
+  </section>
+
+  <!-- LAYER 3: TECHNOLOGY SOLUTIONS -->
+  <section class="layer">
+    <div class="layer-label">Layer 3 — Technology Solutions</div>
+    <h2>What Exists, What's Deployed, What's Blocked</h2>
+
+    <div class="tech-grid">
+      <div class="tech-card">
+        <span class="tech-tag efficiency">Efficiency</span>
+        <h3>Drip Irrigation & Precision Agriculture</h3>
+        <p>Can reduce agricultural water use by 30–50% with no yield loss. Israel deployed this at national scale; Iran has begun pilots but adoption is below 10% of irrigated land.</p>
+        <div class="tech-barrier"><strong>Barrier:</strong> Upfront capital cost + sanctions limiting equipment imports + farmer incentive structures favoring flood irrigation.</div>
+      </div>
+      <div class="tech-card">
+        <span class="tech-tag supply">Supply</span>
+        <h3>Desalination (Persian Gulf Access)</h3>
+        <p>Iran has 2,440 km of Persian Gulf and Oman Sea coastline. Desalination capacity exists but is minimal relative to need. The energy cost is high but feasible given Iran's natural gas resources.</p>
+        <div class="tech-barrier"><strong>Barrier:</strong> Sanctions block procurement of advanced desalination membranes and components. Domestic manufacturing capacity is limited.</div>
+      </div>
+      <div class="tech-card">
+        <span class="tech-tag supply">Supply</span>
+        <h3>Atmospheric Water Generation</h3>
+        <p>AWG technology extracts water from air humidity. Relevant in coastal and higher-humidity regions of northern Iran. Technology is scaling globally but requires energy input.</p>
+        <div class="tech-barrier"><strong>Barrier:</strong> Technology readiness for large-scale deployment is 5–10 years out. Not a near-term solution for agricultural water at the required scale.</div>
+      </div>
+      <div class="tech-card">
+        <span class="tech-tag governance">Governance</span>
+        <h3>Water Rights Reform & Groundwater Metering</h3>
+        <p>Iran's water rights system creates incentives for over-extraction. Metering groundwater usage and establishing tradeable rights frameworks have proven effective in Chile and Australia.</p>
+        <div class="tech-barrier"><strong>Barrier:</strong> Political resistance from agricultural constituencies. Requires institutional capacity that is under pressure.</div>
+      </div>
+      <div class="tech-card">
+        <span class="tech-tag efficiency">Efficiency</span>
+        <h3>Treated Wastewater Reuse</h3>
+        <p>Municipal wastewater treatment and reuse for agriculture is established technology. Singapore reuses 40% of water supply. Iran's current reuse rate is under 5%.</p>
+        <div class="tech-barrier"><strong>Barrier:</strong> Infrastructure investment required. Regulatory frameworks for agricultural use of treated water are underdeveloped.</div>
+      </div>
+      <div class="tech-card">
+        <span class="tech-tag governance">Governance</span>
+        <h3>Crop Shift & Agricultural Restructuring</h3>
+        <p>Transitioning from water-intensive crops (wheat, rice, sugarcane) to drought-tolerant alternatives could reduce agricultural water demand by 40%+ without reducing food output.</p>
+        <div class="tech-barrier"><strong>Barrier:</strong> Cultural, political, and economic resistance. Food sovereignty concerns. Requires 10–15 year transition with farmer support systems.</div>
+      </div>
+    </div>
+
+    <p class="prose">The technology gap in Iran is not primarily technical — it is geopolitical and institutional. Most solutions that could meaningfully reduce Iran's water crisis exist as proven technology. The barriers are sanctions limiting equipment access, political economy problems within the agricultural sector, and a government under too much economic pressure to invest in long-term infrastructure. This is the pattern that distinguishes Iran from comparable arid regions that have achieved water stability: the problem is not unsolvable, but the conditions for solutions are actively constrained.</p>
+  </section>
+
+  <!-- LAYER 4: AI INTELLIGENCE BRIEF -->
+  <section class="layer">
+    <div class="layer-label">Layer 4 — AI Intelligence Brief</div>
+    <h2>Systems Analysis</h2>
+
+    <div class="ai-brief">
+      <div class="ai-brief-header">
+        <span class="ai-brief-label">Generated Intelligence Brief</span>
+        <span class="ai-brief-model">claude-sonnet-4 · water-scarcity-framework v1.0</span>
+      </div>
+      <div class="ai-brief-body" id="brief-output">
+        <p id="brief-text">Click "Generate Intelligence Brief" to produce an AI-synthesized analysis connecting the data above into actionable intelligence.</p>
+      </div>
+      <button class="generate-btn" id="gen-btn" onclick="generateBrief()">Generate Intelligence Brief →</button>
+    </div>
+
+    <p class="prose">The intelligence brief above synthesizes the four data layers into a plain-language assessment for decision-makers: investors, policymakers, journalists, and researchers who need to understand not just what is happening, but what it means and what comes next.</p>
+  </section>
+
+  <!-- LAYER 5: TRAJECTORY & IMPLICATIONS -->
+  <section class="layer" style="border-bottom:none;">
+    <div class="layer-label">Layer 5 — Trajectory & Implications</div>
+    <h2>Where This Ends Without Intervention</h2>
+
+    <p class="prose">Iran's water crisis has passed the threshold where incremental responses can reverse the trajectory. When per capita water availability falls below 1,000 m³ per year — Iran crossed this nationally in 2000 — agricultural systems enter structural retreat. When groundwater depletion exceeds recharge by more than 2:1, the timeline for irreversible aquifer collapse compresses from decades to years. Both thresholds have been crossed. Both are measurable. Neither is reversible without transformational intervention.</p>
+
+    <p class="prose">The most likely trajectory without structural intervention: continued rural depopulation as farming becomes economically unviable in water-stressed provinces; deepening food import dependency in an economy constrained by sanctions from accessing international markets on favorable terms; urban water rationing in Tehran and other major cities, which are themselves approaching stress thresholds; and compounding political instability as water insecurity intersects with economic grievance.</p>
+
+    <p class="prose">The path that changes this outcome requires simultaneous action on three fronts: efficiency transformation in agricultural water use (achievable with existing technology if political economy barriers are addressed); supply augmentation through desalination on Iran's extensive coastline (technically feasible, geopolitically constrained); and governance reform that replaces extraction incentives with conservation incentives. None of these is technically beyond reach. All of them require political conditions that do not currently exist. That gap — between the technically possible and the politically achievable — is where Iran's water future will be determined.</p>
+  </section>
+
+  <!-- SOURCES -->
+  <div class="sources">
+    <h3>Data Sources & Methodology</h3>
+    <ul class="source-list">
+      <li><span class="dot"></span><a href="https://www.wri.org/aqueduct" target="_blank">WRI Aqueduct 4.0 — Water Risk Atlas</a></li>
+      <li><span class="dot"></span><a href="https://grace.jpl.nasa.gov/" target="_blank">NASA GRACE-FO — Groundwater Storage Anomaly</a></li>
+      <li><span class="dot"></span><a href="https://www.fao.org/aquastat/en/" target="_blank">FAO AQUASTAT — Country Water Profile: Iran</a></li>
+      <li><span class="dot"></span><a href="https://www.bis.org/publ/work1314.htm" target="_blank">BIS Working Paper No. 1314 — Water & GDP Impact</a></li>
+      <li><span class="dot"></span>USGS National Water Dashboard</li>
+      <li><span class="dot"></span>Iran Ministry of Energy Water Resources Reports</li>
+      <li><span class="dot"></span>Lake Urmia Restoration Program (UNDP)</li>
+      <li><span class="dot"></span>Bluefield Research — Water Technology Landscape</li>
+    </ul>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <p>Water Scarcity Intelligence Project · A Human-AI Collaborative Build · Justin + Claude · 2026</p>
+  <p style="margin-top:0.5rem;"><a href="#">Methodology</a> · <a href="#">About This Project</a> · <a href="#">Subscribe</a></p>
+</footer>
+
+<script>
+async function generateBrief() {
+  const btn = document.getElementById('gen-btn');
+  const output = document.getElementById('brief-output');
+  const text = document.getElementById('brief-text');
+
+  btn.disabled = true;
+  btn.textContent = 'Generating analysis...';
+  output.style.display = 'block';
+  text.textContent = '';
+
+  const systemPrompt = `You are an intelligence analyst for the Water Scarcity Intelligence Project — a research initiative that synthesizes global water data into systems-level narratives connecting scarcity to economic, agricultural, and human consequences.
+
+Your analytical framework: Water Scarcity → Agricultural Impact → Economic Cascade → Human/Geopolitical Consequences → Technology Solutions Assessment → Comparative Implications.
+
+Write in the voice of a serious, non-sensationalist intelligence brief. No bullet points. Flowing paragraphs. Cite specific data where relevant. Connect dots the reader cannot connect alone. End with the "so what" for investors, policymakers, or researchers.`;
+
+  const userPrompt = `Generate a 3-paragraph intelligence brief on Iran's water crisis using this framework data:
+
+SCARCITY: 97% of Iran under high water stress (WRI Aqueduct). Lake Urmia has lost ~70% of surface area since 1970, now at ~8% of baseline. Average groundwater depletion 1.2m/year in critical agricultural provinces. Per capita water availability below 1,700 m³/year threshold.
+
+ECONOMIC CASCADE: Agricultural sector is 92% of water use, 12% of GDP, 18% of workforce. 2017–2018 drought caused 25% provincial agricultural output decline. Food price inflation exceeded 40% 2018–2023. Sanctions compound import dependency. BIS research projects 6–8% GDP impact from severe water stress in agricultural economies.
+
+TECHNOLOGY BARRIERS: Drip irrigation adoption under 10% of irrigated land. Desalination technically feasible (2,440km coastline) but sanctions block advanced membrane procurement. Governance barriers: water rights reform faces political resistance from agricultural sector.
+
+Write the brief now. 3 paragraphs. Intelligence analyst voice. No headers.`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: [{ role: 'user', content: userPrompt }]
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.content && data.content[0] && data.content[0].text) {
+      const paragraphs = data.content[0].text.split('\n\n').filter(p => p.trim());
+      text.innerHTML = '';
+      paragraphs.forEach(para => {
+        const p = document.createElement('p');
+        p.textContent = para.trim();
+        text.parentNode.insertBefore(p, text);
+      });
+      text.remove();
+      btn.textContent = 'Regenerate →';
+      btn.disabled = false;
+    } else {
+      throw new Error('Unexpected response format');
+    }
+  } catch (err) {
+    text.textContent = 'API call failed. To enable this feature: add your Anthropic API key to this file (search for the fetch call and add an Authorization header). The rest of the tool works without it.';
+    btn.textContent = 'Retry →';
+    btn.disabled = false;
+  }
+}
+</script>
+
+</body>
+</html>
