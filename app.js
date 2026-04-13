@@ -125,10 +125,14 @@
 
   function riskTierClass(score) {
     if (!score) return 'risk-tier-unknown';
-    const s = score.trim().toUpperCase();
-    if (s.startsWith('C')) return 'risk-tier-critical';
-    if (s.startsWith('B')) return 'risk-tier-elevated';
-    if (s.startsWith('A')) return 'risk-tier-stressed';
+    const s = score.trim().toUpperCase().replace(/[+–\-]/g, '');
+    if (s === 'D')   return 'risk-tier-collapsed';
+    if (s === 'CCC') return 'risk-tier-critical';
+    if (s === 'B')   return 'risk-tier-elevated';
+    if (s === 'BB')  return 'risk-tier-moderate';
+    if (s === 'A')   return 'risk-tier-stressed';
+    if (s === 'AA')  return 'risk-tier-low';
+    if (s === 'AAA') return 'risk-tier-secure';
     return 'risk-tier-unknown';
   }
 
@@ -222,6 +226,41 @@
           </div>
           <div class="rating-table">
             <div class="rating-row">
+              <div class="rating-score-col"><span class="rating-badge-lg risk-tier-secure">AAA</span></div>
+              <div class="rating-desc-col">
+                <div class="rating-tier-label">Secure</div>
+                <p>Abundant renewable water resources with sustainable extraction rates. Strong institutional governance and infrastructure. No meaningful water stress under current or projected demand scenarios.</p>
+              </div>
+            </div>
+            <div class="rating-row">
+              <div class="rating-score-col"><span class="rating-badge-lg risk-tier-low">AA&#8211;</span></div>
+              <div class="rating-desc-col">
+                <div class="rating-tier-label">Low Risk</div>
+                <p>Adequate resources with generally sustainable management. Minor localised pressures present but not structurally significant. Long-term outlook stable with current governance capacity.</p>
+              </div>
+            </div>
+            <div class="rating-row">
+              <div class="rating-score-col"><span class="rating-badge-lg risk-tier-stressed">A&#8211;</span></div>
+              <div class="rating-desc-col">
+                <div class="rating-tier-label">Stressed</div>
+                <p>Measurable water stress present in significant regions or sectors. Infrastructure and institutional capacity are generally adequate but operating under increasing pressure. Deteriorating trajectory if current patterns continue.</p>
+              </div>
+            </div>
+            <div class="rating-row">
+              <div class="rating-score-col"><span class="rating-badge-lg risk-tier-moderate">BB&#8211;</span></div>
+              <div class="rating-desc-col">
+                <div class="rating-tier-label">Moderate</div>
+                <p>Structural water stress building across multiple regions or sectors. Depletion is measurable and the trajectory is negative. Intervention is needed to prevent escalation to elevated risk. Early economic signals visible.</p>
+              </div>
+            </div>
+            <div class="rating-row">
+              <div class="rating-score-col"><span class="rating-badge-lg risk-tier-elevated">B&#8211;</span></div>
+              <div class="rating-desc-col">
+                <div class="rating-tier-label">Elevated</div>
+                <p>Significant water stress with a measurable depletion trajectory. Physical depletion is ongoing but not yet irreversible. The economic cascade is visible in data — GDP sensitivity, agricultural exposure, investment gaps — but has not yet produced systemic disruption.</p>
+              </div>
+            </div>
+            <div class="rating-row">
               <div class="rating-score-col"><span class="rating-badge-lg risk-tier-critical">CCC&#8211;</span></div>
               <div class="rating-desc-col">
                 <div class="rating-tier-label">Critical</div>
@@ -229,17 +268,10 @@
               </div>
             </div>
             <div class="rating-row">
-              <div class="rating-score-col"><span class="rating-badge-lg risk-tier-elevated">B&#8211;</span></div>
+              <div class="rating-score-col"><span class="rating-badge-lg risk-tier-collapsed">D</span></div>
               <div class="rating-desc-col">
-                <div class="rating-tier-label">Elevated</div>
-                <p>Significant water stress with a measurable depletion trajectory. Physical depletion is ongoing but not yet irreversible. Institutional intervention could alter the outcome. The economic cascade is visible in data but has not yet produced systemic disruption.</p>
-              </div>
-            </div>
-            <div class="rating-row">
-              <div class="rating-score-col"><span class="rating-badge-lg risk-tier-stressed">A&#8211;</span></div>
-              <div class="rating-desc-col">
-                <div class="rating-tier-label">Stressed</div>
-                <p>Water stress present but within manageable parameters. Infrastructure and institutional capacity are generally adequate to current demand. Long-term risk accumulates if the trajectory continues without intervention.</p>
+                <div class="rating-tier-label">Collapsed</div>
+                <p>System failure. Primary aquifer or surface water source exhausted, or infrastructure breakdown has severed reliable water access for a significant share of the population. Recovery requires external intervention and generational timescales.</p>
               </div>
             </div>
           </div>

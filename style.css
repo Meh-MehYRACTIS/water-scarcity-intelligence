@@ -23,6 +23,10 @@
   --amber-pale:  rgba(239,159,39,0.10);
   --blue:        #378add;
   --blue-pale:   rgba(55,138,221,0.10);
+  --orange:      #d4822a;
+  --orange-pale: rgba(212,130,42,0.10);
+  --crimson:     #9b1c1c;
+  --crimson-pale:rgba(155,28,28,0.10);
   --font:        Georgia, 'Times New Roman', serif;
   --sans:        'Helvetica Neue', Arial, sans-serif;
   --mono:        'Courier New', Courier, monospace;
@@ -1009,6 +1013,12 @@ body {
   line-height: 1;
 }
 
+.risk-tier-collapsed {
+  color: var(--crimson);
+  background: var(--crimson-pale);
+  border: 1px solid rgba(155,28,28,0.25);
+}
+
 .risk-tier-critical {
   color: var(--danger);
   background: var(--danger-pale);
@@ -1021,10 +1031,28 @@ body {
   border: 1px solid rgba(239,159,39,0.25);
 }
 
+.risk-tier-moderate {
+  color: var(--orange);
+  background: var(--orange-pale);
+  border: 1px solid rgba(212,130,42,0.25);
+}
+
 .risk-tier-stressed {
+  color: var(--blue);
+  background: var(--blue-pale);
+  border: 1px solid rgba(55,138,221,0.25);
+}
+
+.risk-tier-low {
   color: var(--accent);
   background: var(--accent-pale);
   border: 1px solid rgba(29,158,117,0.25);
+}
+
+.risk-tier-secure {
+  color: var(--accent);
+  background: var(--accent-pale);
+  border: 2px solid var(--accent);
 }
 
 .risk-tier-unknown {
