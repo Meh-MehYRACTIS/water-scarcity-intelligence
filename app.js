@@ -20,6 +20,10 @@
   const elLoadingLabel = elLoading.querySelector('.loading-label');
   const elErrorBody    = elError.querySelector('.error-body');
 
+  // Cached countries list — set once in init, reused for navigation
+  let cachedCountries = [];
+  let selectorListenerAttached = false;
+
   // ----------------------------------------------------------
   // State helpers
   // ----------------------------------------------------------
@@ -100,7 +104,7 @@
 
   async function fetchCountries() {
     return apiFetch(
-      'countries?select=name,code,region,risk_score,risk_outlook' +
+      'countries?select=name,code,region,risk_score,risk_outlook,headline' +
       '&is_published=eq.true&order=name.asc'
     );
   }
@@ -113,6 +117,240 @@
       throw new Error(`No published assessment found for code "${code}".`);
     }
     return rows[0];
+  }
+
+  // ----------------------------------------------------------
+  // RENDER: Home page
+  // ----------------------------------------------------------
+
+  function riskTierClass(score) {
+    if (!score) return 'risk-tier-unknown';
+    const s = score.trim().toUpperCase();
+    if (s.startsWith('C')) return 'risk-tier-critical';
+    if (s.startsWith('B')) return 'risk-tier-elevated';
+    if (s.startsWith('A')) return 'risk-tier-stressed';
+    return 'risk-tier-unknown';
+  }
+
+  function renderCountryCard(country) {
+    const tierClass = riskTierClass(country.risk_score);
+    return `
+      <div class="country-card" data-code="${esc(country.code)}" role="button" tabindex="0" aria-label="View ${esc(country.name)} assessment">
+        <div class="card-header">
+          <span class="card-risk-badge ${tierClass}">${esc(country.risk_score)}</span>
+          <span class="card-region">${esc(country.region)}</span>
+        </div>
+        <div class="card-name">${esc(country.name)}</div>
+        ${country.headline ? `<div class="card-headline">${esc(country.headline)}</div>` : ''}
+        <div class="card-outlook">${esc(country.risk_outlook)}</div>
+        <div class="card-cta">View Assessment <span aria-hidden="true">&rarr;</span></div>
+      </div>`;
+  }
+
+  function renderHomePage() {
+    const cards = cachedCountries.map(renderCountryCard).join('');
+    const countLabel = cachedCountries.length === 1 ? '1 Assessment' : `${cachedCountries.length} Assessments`;
+    return `
+      <section class="home-hero">
+        <div class="container">
+          <div class="home-eyebrow">Water Scarcity Intelligence Project</div>
+          <h1 class="home-headline">Country-Level Water Risk Intelligence</h1>
+          <p class="home-deck">Structured assessments of groundwater depletion, aquifer collapse, and cascade failure — drawing on NASA GRACE-FO, WRI Aqueduct, FAO AQUASTAT, and BIS research. Rated, sourced, and readable in under 60 seconds.</p>
+        </div>
+      </section>
+
+      <section class="home-section home-gap-section">
+        <div class="container">
+          <div class="home-gap-callout">Raw data exists. Intelligence doesn't.</div>
+          <div class="home-gap-body">
+            <p>NASA GRACE-FO satellite data tracks aquifer depletion across every major basin on earth. WRI Aqueduct maps water stress levels for every country and sub-basin. FAO AQUASTAT documents annual withdrawals by sector. All of this data is public and authoritative.</p>
+            <p>What it doesn't do is tell you what it means — or what breaks next.</p>
+            <p>This tool synthesises primary data into rated country assessments: a risk score, a cascade model tracing how water stress flows into food insecurity, economic disruption, and political instability, and a plain-language intelligence brief you can cite and use. Every assessment follows the same framework so countries can be compared against each other and tracked over time.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="home-section home-section-alt">
+        <div class="container">
+          <div class="home-section-label">Who uses this</div>
+          <div class="use-case-grid">
+            <div class="use-case-card">
+              <div class="use-case-title">Journalists</div>
+              <p>Sourced, quantified background for any country water story. Risk score, cascade model, and primary citations in under 60 seconds. Every statistic links to its original data source.</p>
+            </div>
+            <div class="use-case-card">
+              <div class="use-case-title">Investors</div>
+              <p>Screen sovereign debt, agricultural commodity exposure, or supply chain risk against quantified water depletion data. The economic cascade section maps how water stress transmits to GDP and inflation.</p>
+            </div>
+            <div class="use-case-card">
+              <div class="use-case-title">Policymakers &amp; NGOs</div>
+              <p>Benchmark countries against each other using a consistent framework. Understand where the trajectory is most dangerous, where intervention still has leverage, and where the window is closing.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="home-section">
+        <div class="container">
+          <div class="home-section-label">${esc(countLabel)}</div>
+          <div class="country-grid">${cards}</div>
+        </div>
+      </section>`;
+  }
+
+  // ----------------------------------------------------------
+  // RENDER: Methodology page
+  // ----------------------------------------------------------
+
+  function renderMethodologyPage() {
+    return `
+      <section class="home-hero">
+        <div class="container">
+          <div class="home-eyebrow"><a href="/" class="back-link" data-nav-page="">&#8592; Water Scarcity Intelligence</a></div>
+          <h1 class="home-headline">Methodology</h1>
+          <p class="home-deck">How country assessments are produced, what data they draw on, and what the ratings mean.</p>
+        </div>
+      </section>
+
+      <section class="layer">
+        <div class="container">
+          <h2 class="layer-title">The Rating Framework</h2>
+          <p class="layer-subtitle">A three-tier scale modelled on credit risk analysis</p>
+          <div class="body-text">
+            <p>Each country is assigned a Water Bankruptcy Risk Rating reflecting the current state and trajectory of its water systems. The scale has three tiers, each with three gradations. The minus modifier (&#8211;) indicates a deteriorating trajectory within the tier; the plus (+) indicates stable or improving conditions.</p>
+          </div>
+          <div class="rating-table">
+            <div class="rating-row">
+              <div class="rating-score-col"><span class="rating-badge-lg risk-tier-critical">CCC&#8211;</span></div>
+              <div class="rating-desc-col">
+                <div class="rating-tier-label">Critical</div>
+                <p>Structural water deficit already underway. Aquifer depletion is irreversible at current extraction rates on decadal timescales. Agricultural and economic cascade actively in progress. Physical constraints are beginning to override institutional responses.</p>
+              </div>
+            </div>
+            <div class="rating-row">
+              <div class="rating-score-col"><span class="rating-badge-lg risk-tier-elevated">B&#8211;</span></div>
+              <div class="rating-desc-col">
+                <div class="rating-tier-label">Elevated</div>
+                <p>Significant water stress with a measurable depletion trajectory. Physical depletion is ongoing but not yet irreversible. Institutional intervention could alter the outcome. The economic cascade is visible in data but has not yet produced systemic disruption.</p>
+              </div>
+            </div>
+            <div class="rating-row">
+              <div class="rating-score-col"><span class="rating-badge-lg risk-tier-stressed">A&#8211;</span></div>
+              <div class="rating-desc-col">
+                <div class="rating-tier-label">Stressed</div>
+                <p>Water stress present but within manageable parameters. Infrastructure and institutional capacity are generally adequate to current demand. Long-term risk accumulates if the trajectory continues without intervention.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="layer layer-alt">
+        <div class="container">
+          <h2 class="layer-title">The W&#8594;A&#8594;E&#8594;S Cascade Model</h2>
+          <p class="layer-subtitle">Why water stress never stays in the water sector</p>
+          <div class="body-text">
+            <p>The cascade model is the analytical core of every country assessment. It traces the transmission pathway from physical water scarcity through economic sectors to social and political instability.</p>
+          </div>
+          <div class="method-cascade">
+            <div class="method-cascade-step">
+              <div class="method-cascade-key">W</div>
+              <div class="method-cascade-content">
+                <div class="method-cascade-title">Water</div>
+                <p>Physical availability and depletion rates. How much water exists, how fast it is being consumed relative to natural recharge, and whether the trajectory is reversible. Primary sources: NASA GRACE-FO, WRI Aqueduct, FAO AQUASTAT.</p>
+              </div>
+            </div>
+            <div class="method-cascade-arrow">&#8595;</div>
+            <div class="method-cascade-step">
+              <div class="method-cascade-key">A</div>
+              <div class="method-cascade-content">
+                <div class="method-cascade-title">Agriculture</div>
+                <p>Agricultural systems account for approximately 70% of global freshwater withdrawals. When water becomes scarce, farming is typically the first sector disrupted — through reduced yields, fallowed land, or crop abandonment. In export-oriented economies, this transmits directly to trade flows.</p>
+              </div>
+            </div>
+            <div class="method-cascade-arrow">&#8595;</div>
+            <div class="method-cascade-step">
+              <div class="method-cascade-key">E</div>
+              <div class="method-cascade-content">
+                <div class="method-cascade-title">Economics</div>
+                <p>Water-driven agricultural failure creates measurable economic effects: GDP deceleration, food price inflation, reduced export revenue, and infrastructure damage. These effects are documented in peer-reviewed research and central bank working papers including BIS Working Papers.</p>
+              </div>
+            </div>
+            <div class="method-cascade-arrow">&#8595;</div>
+            <div class="method-cascade-step">
+              <div class="method-cascade-key">S</div>
+              <div class="method-cascade-content">
+                <div class="method-cascade-title">Social</div>
+                <p>Economic disruption transmits to social and political instability: internal migration, food insecurity, protests over water access, and in the most acute cases, armed conflict over water infrastructure. This is documented in every country assessed at CCC rating.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="layer">
+        <div class="container">
+          <h2 class="layer-title">Primary Data Sources</h2>
+          <p class="layer-subtitle">What each source measures, what it covers, and its limitations</p>
+          <div class="source-detail-list">
+            <div class="source-detail-item">
+              <div class="source-detail-name">WRI Aqueduct 4.0</div>
+              <div class="source-detail-org">World Resources Institute</div>
+              <p><strong>Measures:</strong> Country and basin-level water stress, depletion ratios, inter-annual variability, and groundwater table decline.</p>
+              <p><strong>Coverage:</strong> Global. Updated 2023 with data through 2019; projections to 2030 and 2050.</p>
+              <p><strong>Limitation:</strong> Stress indicators are modelled from hydrological data. Does not capture informal or unlicensed extraction, which can be substantial in heavily agricultural economies.</p>
+            </div>
+            <div class="source-detail-item">
+              <div class="source-detail-name">NASA GRACE-FO</div>
+              <div class="source-detail-org">Gravity Recovery and Climate Experiment Follow-On &middot; NASA / DLR</div>
+              <p><strong>Measures:</strong> Changes in terrestrial water storage by detecting gravitational anomalies. When groundwater is extracted, land mass decreases and gravity weakens slightly — GRACE-FO detects this.</p>
+              <p><strong>Coverage:</strong> Global, monthly data since 2018. Original GRACE mission data available from 2002.</p>
+              <p><strong>Limitation:</strong> Spatial resolution is approximately 300km. Measures total water storage change, not groundwater alone. Separation of groundwater signal requires additional hydrological modelling.</p>
+            </div>
+            <div class="source-detail-item">
+              <div class="source-detail-name">FAO AQUASTAT</div>
+              <div class="source-detail-org">Food and Agriculture Organisation of the United Nations</div>
+              <p><strong>Measures:</strong> Annual freshwater withdrawals by sector, total renewable water resources, irrigation statistics.</p>
+              <p><strong>Coverage:</strong> Global country-level data. Update frequency varies by country.</p>
+              <p><strong>Limitation:</strong> Statistics are often self-reported by national governments and may lag by several years.</p>
+            </div>
+            <div class="source-detail-item">
+              <div class="source-detail-name">BIS Working Papers</div>
+              <div class="source-detail-org">Bank for International Settlements</div>
+              <p><strong>Measures:</strong> Economic and financial system impacts of climate and water stress. BIS Working Paper No. 1314 documents the transmission pathway from water stress to inflation and GDP outcomes.</p>
+              <p><strong>Limitation:</strong> Working papers represent research perspectives, not official BIS policy positions.</p>
+            </div>
+            <div class="source-detail-item">
+              <div class="source-detail-name">National agency data</div>
+              <div class="source-detail-org">e.g. CONAGUA (Mexico), IRIMO (Iran)</div>
+              <p><strong>Measures:</strong> Country-specific aquifer classifications, extraction permit volumes, reservoir levels, and infrastructure data.</p>
+              <p><strong>Limitation:</strong> Permitted extraction volumes do not always reflect actual extraction. Where national agency data conflicts with satellite or independent data, both are noted in the assessment.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="layer layer-alt">
+        <div class="container">
+          <h2 class="layer-title">What This Is Not</h2>
+          <div class="body-text">
+            <p><strong>Not investment advice.</strong> Assessments are analytical tools, not financial products. They are intended to inform analysis, not substitute for it.</p>
+            <p><strong>Not algorithmic.</strong> Ratings are qualitative assessments produced by human analysts synthesising multiple data sources. The rating reflects a reasoned judgement about the weight of evidence.</p>
+            <p><strong>Not real-time.</strong> Each assessment reflects conditions as of its published date. The published date and framework version are shown on every assessment.</p>
+            <p><strong>Not comprehensive.</strong> Framework v1.0 covers the primary transmission pathway from physical water stress to social instability. It does not model second-order effects such as cross-border water conflict or financial contagion from water-exposed sovereign debt.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="layer">
+        <div class="container">
+          <h2 class="layer-title">Versioning</h2>
+          <div class="body-text">
+            <p>The analytical framework is versioned independently of individual country assessments. Framework Version 1.0 was released April 2026 and covers the five-layer model: Scarcity Status, Economic Cascade, Technology &amp; Solutions, Intelligence Brief, and Trajectory &amp; Implications.</p>
+            <p>Individual country assessments carry their own <code>published_date</code> and may be updated when significant new data warrants revision. Methodology updates that change how ratings are assigned will increment the framework version number.</p>
+          </div>
+        </div>
+      </section>`;
   }
 
   // ----------------------------------------------------------
@@ -433,37 +671,98 @@
        </option>`
     ).join('');
 
-    elSelect.addEventListener('change', e => navigate(e.target.value));
+    if (!selectorListenerAttached) {
+      elSelect.addEventListener('change', e => navigate(e.target.value));
+      selectorListenerAttached = true;
+    }
 
-    // Show selector only when there is at least one country
     if (countries.length > 0) {
       elSelectorWrap.style.display = 'flex';
     }
   }
 
   // ----------------------------------------------------------
-  // Routing via URL query string: ?country=ir
+  // Routing via URL query string: ?country=ir  ?page=methodology
   // ----------------------------------------------------------
 
   function codeFromURL() {
     return new URLSearchParams(window.location.search).get('country');
   }
 
+  function pageFromURL() {
+    return new URLSearchParams(window.location.search).get('page');
+  }
+
   function navigate(code) {
     const url = new URL(window.location.href);
+    url.search = '';
     url.searchParams.set('country', code);
     window.history.pushState({}, '', url.toString());
+    populateSelector(cachedCountries, code);
     loadCountry(code);
+  }
+
+  function navigatePage(page) {
+    const url = new URL(window.location.href);
+    url.search = '';
+    if (page) url.searchParams.set('page', page);
+    window.history.pushState({}, '', url.toString());
+    if (page === 'methodology') {
+      elSelectorWrap.style.display = 'none';
+      loadMethodology();
+    } else {
+      elSelectorWrap.style.display = 'none';
+      loadHome();
+    }
   }
 
   window.addEventListener('popstate', () => {
     const code = codeFromURL();
-    if (code) loadCountry(code);
+    const page = pageFromURL();
+    if (code && cachedCountries.find(c => c.code === code)) {
+      populateSelector(cachedCountries, code);
+      loadCountry(code);
+    } else if (page === 'methodology') {
+      elSelectorWrap.style.display = 'none';
+      loadMethodology();
+      showApp();
+    } else {
+      elSelectorWrap.style.display = 'none';
+      loadHome();
+    }
   });
 
   // ----------------------------------------------------------
-  // Load a single country and paint it
+  // Page loaders
   // ----------------------------------------------------------
+
+  function loadHome() {
+    document.title = 'Water Scarcity Intelligence — Country Risk Assessments';
+    elSelectorWrap.style.display = 'none';
+    elContent.innerHTML = renderHomePage();
+    elContent.querySelectorAll('.country-card[data-code]').forEach(card => {
+      card.addEventListener('click', () => navigate(card.dataset.code));
+      card.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); navigate(card.dataset.code); }
+      });
+    });
+    elContent.querySelectorAll('[data-nav-page]').forEach(el => {
+      el.addEventListener('click', e => { e.preventDefault(); navigatePage(el.dataset.navPage); });
+    });
+    showApp();
+    window.scrollTo(0, 0);
+  }
+
+  function loadMethodology() {
+    document.title = 'Methodology — Water Scarcity Intelligence';
+    elSelectorWrap.style.display = 'none';
+    elContent.innerHTML = renderMethodologyPage();
+    elContent.querySelectorAll('[data-nav-page]').forEach(el => {
+      el.addEventListener('click', e => { e.preventDefault(); navigatePage(el.dataset.navPage); });
+    });
+    showApp();
+    window.scrollTo(0, 0);
+  }
 
   async function loadCountry(code) {
     showLoading(`Loading ${code.toUpperCase()} assessment…`);
@@ -483,7 +782,6 @@
   // ----------------------------------------------------------
 
   async function init() {
-    // Guard against un-configured placeholder values
     if (
       typeof SUPABASE_URL      === 'undefined' ||
       typeof SUPABASE_ANON_KEY === 'undefined' ||
@@ -499,39 +797,43 @@
 
     showLoading('Connecting to intelligence database…');
 
-    let countries;
     try {
-      countries = await fetchCountries();
+      cachedCountries = await fetchCountries();
     } catch (err) {
-      showError(
-        `Failed to connect to Supabase: ${err.message}. ` +
-        'Check your SUPABASE_URL and SUPABASE_ANON_KEY in config.js.'
-      );
+      showError(`Failed to connect to Supabase: ${err.message}. Check your SUPABASE_URL and SUPABASE_ANON_KEY in config.js.`);
       return;
     }
 
-    if (!countries || countries.length === 0) {
-      showError(
-        'Database is empty. Run supabase/seeds/iran.sql in the Supabase SQL Editor ' +
-        'to add the first country assessment.'
-      );
+    if (!cachedCountries || cachedCountries.length === 0) {
+      showError('Database is empty. Run supabase/seeds/iran.sql in the Supabase SQL Editor to add the first country assessment.');
       return;
     }
 
-    // Determine which country to show: URL param → first in list
+    // Wire up footer / header nav links that persist across all pages
+    document.querySelectorAll('[data-nav-page]').forEach(el => {
+      el.addEventListener('click', e => { e.preventDefault(); navigatePage(el.dataset.navPage); });
+    });
+    document.querySelector('.brand').addEventListener('click', e => {
+      e.preventDefault();
+      navigatePage('');
+    });
+
     const requestedCode = codeFromURL();
-    const code = (requestedCode && countries.find(c => c.code === requestedCode))
-      ? requestedCode
-      : countries[0].code;
+    const requestedPage = pageFromURL();
 
-    populateSelector(countries, code);
-
-    // Push the resolved code into the URL without creating a history entry
-    const url = new URL(window.location.href);
-    url.searchParams.set('country', code);
-    window.history.replaceState({}, '', url.toString());
-
-    await loadCountry(code);
+    if (requestedPage === 'methodology') {
+      loadMethodology();
+      showApp();
+    } else if (requestedCode && cachedCountries.find(c => c.code === requestedCode)) {
+      populateSelector(cachedCountries, requestedCode);
+      await loadCountry(requestedCode);
+    } else {
+      // Default: home page
+      const url = new URL(window.location.href);
+      url.search = '';
+      window.history.replaceState({}, '', url.toString());
+      loadHome();
+    }
   }
 
   init();
