@@ -156,6 +156,7 @@
           <div class="home-eyebrow">Water Scarcity Intelligence Project</div>
           <h1 class="home-headline">Country-Level Water Risk Intelligence</h1>
           <p class="home-deck">Structured assessments of groundwater depletion, aquifer collapse, and cascade failure — drawing on NASA GRACE-FO, WRI Aqueduct, FAO AQUASTAT, and BIS research. Rated, sourced, and readable in under 60 seconds.</p>
+          <a href="/?page=methodology" class="home-method-link" data-nav-page="methodology">How assessments are rated &rarr;</a>
         </div>
       </section>
 

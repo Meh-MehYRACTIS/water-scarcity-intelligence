@@ -881,7 +881,20 @@ body {
   color: var(--text-sec);
   line-height: 1.65;
   max-width: 660px;
+  margin-bottom: 24px;
 }
+
+.home-method-link {
+  display: inline-block;
+  font-family: var(--sans);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--accent);
+  text-decoration: none;
+  letter-spacing: 0.02em;
+}
+
+.home-method-link:hover { text-decoration: underline; }
 
 .home-section {
   padding: 60px 0;
